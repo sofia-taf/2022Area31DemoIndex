@@ -1,7 +1,7 @@
 ## Preprocess data, write TAF data tables
 
-## Before: catch.csv, effort.csv, priors.csv (bootstrap/data)
-## After:  catch_by_stock.png, catch_effort.csv, catch_relative.png,
+## Before: catch.csv, index.csv, priors.csv (bootstrap/data)
+## After:  catch_by_stock.png, catch_index.csv, catch_relative.png,
 ##         catch_total.png, driors.pdf, input.rds (data)
 
 library(TAF)
@@ -55,14 +55,14 @@ catch %>%
   geom_point()
 ggsave("data/catch_relative.png", width=12, height=6)
 
-## Read effort data, combine catch and effort data
-effort <- read.taf("bootstrap/data/effort.csv")
-effort <- pivot_longer(effort, !Year, "stock", values_to="effort")
-names(effort) <- tolower(names(effort))
-catch_effort <- addEffort(catch, effort, same.effort=FALSE)
+## Read index data, combine catch and index data
+index <- read.taf("bootstrap/data/index.csv")
+index <- pivot_longer(index, !Year, "stock", values_to="index")
+names(index) <- tolower(names(index))
+catch_index <- addIndex(catch, index, same.index=FALSE)
 
-## Create nested tibble with 'data' column (catch and effort)
-stocks <- catch_effort %>%
+## Create nested tibble with 'data' column (catch and index)
+stocks <- catch_index %>%
   group_by(stock) %>%
   nest() %>%
   ungroup()
@@ -79,13 +79,13 @@ addDriors <- function(stocks, priors, stocks.combined, shape_prior = 2, b_ref_ty
     p <- if (stocks.combined)
       match("All", priors$stock)
     else match(stocks$stock[i], priors$stock)
-    driors[[i]] <- format_driors(taxa = stocks$taxa[i], shape_prior = 2,
+    driors[[i]] <- format_driors(taxa = stocks$stock[i], shape_prior = 2,
                                  catch = stocks$data[[i]]$capture, years = stocks$data[[i]]$year,
                                  initial_state = priors$initial_state[p], initial_state_cv = priors$initial_state_cv[p],
                                  b_ref_type = "k",
                                  #terminal_state = priors$terminal_state[p],
                                  #terminal_state_cv = priors$terminal_state_cv[p],
-                                 index = na.omit(stocks$data[[i]])$effort,
+                                 index = na.omit(stocks$data[[i]])$index,
                                  index_years =na.omit(stocks$data[[i]])$year, growth_rate_prior = NA,
                                  growth_rate_prior_cv = 0.2, ...)
   }
@@ -104,6 +104,6 @@ for(i in seq_len(nrow(stocks)))
 }
 dev.off()
 
-## Export stocks and catch_effort
+## Export stocks and catch_index
 saveRDS(stocks, "data/input.rds")
-write.taf(catch_effort, dir="data")
+write.taf(catch_index, dir="data")
