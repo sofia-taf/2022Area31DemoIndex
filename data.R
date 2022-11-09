@@ -71,12 +71,12 @@ stocks <- catch_index %>%
 priors <- read.taf("bootstrap/data/priors.csv")
 
 ## Modified addDriors
-addDriors <- function(stocks, priors, stocks.combined, shape_prior = 2, b_ref_type = "k",
+addDriors <- function(stocks, priors, same.priors, shape_prior = 2, b_ref_type = "k",
                       growth_rate_prior = NA, growth_rate_prior_cv = 0.2, ...)
 {
   driors <- list()
   for (i in seq_len(nrow(stocks))) {
-    p <- if (stocks.combined)
+    p <- if (same.priors)
       match("All", priors$stock)
     else match(stocks$stock[i], priors$stock)
     driors[[i]] <- format_driors(taxa = stocks$stock[i], shape_prior = 2,
@@ -93,7 +93,7 @@ addDriors <- function(stocks, priors, stocks.combined, shape_prior = 2, b_ref_ty
   stocks
 }
 
-stocks <- addDriors(stocks, priors, stocks.combined=TRUE)
+stocks <- addDriors(stocks, priors, same.priors=TRUE)
 
 ## Plot driors
 pdf("data/driors.pdf")
