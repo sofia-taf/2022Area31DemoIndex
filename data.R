@@ -71,23 +71,28 @@ stocks <- catch_index %>%
 priors <- read.taf("bootstrap/data/priors.csv")
 
 ## Modified addDriors
-addDriors <- function(stocks, priors, same.priors, shape_prior = 2, b_ref_type = "k",
-                      growth_rate_prior = NA, growth_rate_prior_cv = 0.2, ...)
+addDriors <- function(stocks, priors, same.priors, shape_prior = 2,
+                      b_ref_type = "k", growth_rate_prior = NA,
+                      growth_rate_prior_cv = 0.2, ...)
 {
   driors <- list()
   for (i in seq_len(nrow(stocks))) {
     p <- if (same.priors)
-      match("All", priors$stock)
-    else match(stocks$stock[i], priors$stock)
-    driors[[i]] <- format_driors(taxa = stocks$stock[i], shape_prior = shape_prior,
-                                 catch = stocks$data[[i]]$capture, years = stocks$data[[i]]$year,
-                                 initial_state = priors$initial_state[p], initial_state_cv = priors$initial_state_cv[p],
-                                 b_ref_type = b_ref_type,
-                                 #terminal_state = priors$terminal_state[p],
-                                 #terminal_state_cv = priors$terminal_state_cv[p],
-                                 index = na.omit(stocks$data[[i]])$index,
-                                 index_years =na.omit(stocks$data[[i]])$year, growth_rate_prior = growth_rate_prior,
-                                 growth_rate_prior_cv = growth_rate_prior_cv, ...)
+           match("All", priors$stock) else match(stocks$stock[i], priors$stock)
+    driors[[i]] <- format_driors(
+      taxa = stocks$stock[i],
+      shape_prior = shape_prior,
+      catch = stocks$data[[i]]$capture,
+      years = stocks$data[[i]]$year,
+      initial_state = priors$initial_state[p],
+      initial_state_cv = priors$initial_state_cv[p],
+      b_ref_type = b_ref_type,
+      # terminal_state = priors$terminal_state[p],
+      # terminal_state_cv = priors$terminal_state_cv[p],
+      index = na.omit(stocks$data[[i]])$index,
+      index_years = na.omit(stocks$data[[i]])$year,
+      growth_rate_prior = growth_rate_prior,
+      growth_rate_prior_cv = growth_rate_prior_cv, ...)
   }
   stocks$driors <- driors
   stocks
