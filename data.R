@@ -70,8 +70,8 @@ stocks <- catch_index %>%
 ## Read priors data, add as driors to stocks object
 priors <- read.taf("bootstrap/data/priors.csv")
 
-## Custom addDriors function
-addDriors <- function(stocks, priors, same.priors)
+## Custom function to add driors
+customDriors <- function(stocks, priors, same.priors)
 {
   driors <- list()
   for (i in seq_len(nrow(stocks))) {
@@ -97,7 +97,7 @@ addDriors <- function(stocks, priors, same.priors)
   stocks
 }
 
-stocks <- addDriors(stocks, priors, same.priors=TRUE)
+stocks <- customDriors(stocks, priors, same.priors=TRUE)
 
 ## Plot driors
 pdf("data/driors.pdf")
