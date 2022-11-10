@@ -3,7 +3,8 @@
 ## Before: sofia20_proportions.csv (bootstrap/data), results.rds (model),
 ##         current_status.csv, stock_timeseries.csv (output)
 ## After:  bbmsy.png, status_by_year.png, status_sofia.png, status_sraplus.png,
-##         stock_cpue.pdf, stock_posterior.pdf, stock_timeseries.pdf (report)
+##         stock_biomass_index.pdf, stock_posterior.pdf,
+##         stock_timeseries.pdf (report)
 
 library(TAF)
 taf.library(SOFIA)
@@ -16,13 +17,14 @@ mkdir("report")
 stocks <- readRDS("model/results.rds")
 levels <- c("Underfished", "Fully fished", "Overfished")
 
-## Plot CPUE
-pdf("report/stock_cpue.pdf")
+## Plot biomass index
+pdf("report/stock_biomass_index.pdf")
 for(i in seq_len(nrow(stocks)))
 {
-  x <- stocks$driors[[i]]$effort_years
-  y <- with(stocks$driors[[i]], catch[years %in% x] / effort)
-  plot(x, y, ylim=lim(y), main=stocks$stock[i], xlab="", ylab="CPUE", type="l")
+  x <- stocks$driors[[i]]$index_years
+  y <- stocks$driors[[i]]$index
+  plot(x, y, ylim=lim(y), main=stocks$stock[i], xlab="", ylab="Biomass index",
+       type="l")
 }
 dev.off()
 
